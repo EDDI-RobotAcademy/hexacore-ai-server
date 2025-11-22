@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-dotenv
+pydantic-settings
+langchain
+openai
+pdfplumber
+python-docx
+beautifulsoup4
+aiohttp
+sqlalchemy
+pymysql
+redis
