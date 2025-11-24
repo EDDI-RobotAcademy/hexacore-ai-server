@@ -2,3 +2,5 @@
 /.code/
 /hexacore-ai-server.iml
 /.env
+*.pyc
+__pycache__/
