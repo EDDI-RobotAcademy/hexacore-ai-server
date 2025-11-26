@@ -89,8 +89,8 @@ class CrawlingEngine:
         return articles
 
     # aync test
-    async def article_analysis(self)-> List[Article]:
-        articles=self.crawl_pages()
+    async def article_analysis(self, page_count: int = 5) -> List[Article]:
+        articles = self.crawl_pages(page_count=page_count)
         return_articles = []
         for article in articles:
             # 엄격한 JSON 형식 프롬프트로 게시글 분석 (prompts.py에서 다른 프롬프트 선택 가능)
@@ -101,9 +101,3 @@ class CrawlingEngine:
 
             return_articles.append(Article(title=article.title, content=article.content, analysis=analysis))
         return return_articles
-
-
-    # 기존 메서드 (호환성 유지)
-    def get_page_to_list(self):
-        """기존 메서드 - crawl_pages로 대체됨"""
-        return self.article_analysis()

@@ -24,11 +24,11 @@ async def crawl_paxnet(
     - 각 게시글의 제목, 본문, URL을 반환합니다.
     """
     engine = CrawlingEngine()
-    articles = engine.crawl_pages(page_count=page_count)
+    articles = await engine.article_analysis(page_count=page_count)
 
     return CrawlingResponse(
         articles=[
-            {"title": a.title, "content": a.content[:500], "url": a.url}
+            {"title": a.title, "content": a.content[:500], "url": a.url, "analysis": a.analysis}
             for a in articles
         ],
         total_count=len(articles)
