@@ -1,12 +1,18 @@
 import re
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
+from sched import scheduler
 from typing import List, Optional, Dict, Any
 import asyncio
 import requests
 from bs4 import BeautifulSoup
 
+
 from app.crawling.Engine.prompts import STRICT_JSON_PROMPT
+
+from app.data.domain.data import Data
 from app.post_analysis.infrastructure.service.openai_service_impl import OpenAIServiceImpl
+
 
 
 @dataclass
@@ -89,15 +95,16 @@ class CrawlingEngine:
         return articles
 
     # aync test
-    async def article_analysis(self, page_count: int = 5) -> List[Article]:
+    async def article_analysis(self, page_count: int = 5):
         articles = self.crawl_pages(page_count=page_count)
         return_articles = []
+
         for article in articles:
             # 엄격한 JSON 형식 프롬프트로 게시글 분석 (prompts.py에서 다른 프롬프트 선택 가능)
             analysis = await self.OAS.analyze_stock_post(article.content, prompt_template=STRICT_JSON_PROMPT)
 
-            print(f"분석: {type(analysis)}")
-            print(f"분석: {(analysis)}")
+            return_articles.append(Data(title=analysis.get("title"), content=analysis.get("content"), keywords=analysis.get("keywords")))
 
-            return_articles.append(Article(title=article.title, content=article.content, analysis=analysis))
         return return_articles
+
+
