@@ -42,3 +42,9 @@ export type WeeklyStockStat = {
   positiveRatio: number;
 };
 
+export type KeywordMention = {
+  id: number;
+  name: string;
+  mention_count: number;
+};
+

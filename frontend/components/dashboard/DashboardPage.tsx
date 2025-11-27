@@ -2,70 +2,77 @@
 
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchWeeklyStockStats } from "@/lib/api";
+import { fetchTopKeywords } from "@/lib/api";
 import MetricCard from "../cards/MetricCard";
-import WeeklyMentionsChart from "../charts/WeeklyMentionsChart";
-import WeeklyMentionsList from "./WeeklyMentionsList";
+import KeywordRankingChart from "../charts/KeywordRankingChart";
+import KeywordPieChart from "../charts/KeywordPieChart";
+import KeywordWordCloud from "../charts/KeywordWordCloud";
 
 export default function DashboardPage() {
-  const weeklyQuery = useQuery({
-    queryKey: ["weeklyStats"],
-    queryFn: fetchWeeklyStockStats
+  const keywordQuery = useQuery({
+    queryKey: ["topKeywords"],
+    queryFn: () => fetchTopKeywords(1000)
   });
 
-  const weeklyMetrics = useMemo(() => {
-    if (!weeklyQuery.data?.length) {
+  const keywordMetrics = useMemo(() => {
+    if (!keywordQuery.data?.length) {
       return {
         totalMentions: 0,
         topKeyword: "--",
         topMentions: "--",
-        topPositive: "--%"
+        uniqueKeywords: 0
       };
     }
 
-    const totalMentions = weeklyQuery.data.reduce(
-      (sum, item) => sum + item.weeklyMentions,
+    const totalMentions = keywordQuery.data.reduce(
+      (sum, item) => sum + item.mention_count,
       0
     );
-    const sorted = [...weeklyQuery.data].sort(
-      (a, b) => b.weeklyMentions - a.weeklyMentions
-    );
-    const top = sorted[0];
+    const top = keywordQuery.data[0];
 
     return {
       totalMentions,
-      topKeyword: `${top.name} (${top.code})`,
-      topMentions: `${top.weeklyMentions.toLocaleString()}건`,
-      topPositive: `${Math.round(top.positiveRatio * 100)}%`
+      topKeyword: top.name,
+      topMentions: `${top.mention_count.toLocaleString()}회`,
+      uniqueKeywords: keywordQuery.data.length
     };
-  }, [weeklyQuery.data]);
+  }, [keywordQuery.data]);
 
   return (
-    <main className="px-6 py-8 max-w-5xl mx-auto space-y-6">
+    <main className="px-6 py-8 max-w-6xl mx-auto space-y-8">
       <header className="flex flex-col gap-2">
-        <p className="text-sm uppercase tracking-[0.3em] text-brand-200">HexaCore</p>
-        <h1 className="text-3xl font-bold">1주일 주식 언급량 인사이트</h1>
-        <p className="text-white/60 text-sm">
-          최근 7일간 커뮤니티 언급량과 긍정 비율을 간단히 확인하세요.
+        <p className="text-sm uppercase tracking-[0.3em] text-emerald-400/80">HexaCore</p>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+          키워드 분석 대시보드
+        </h1>
+        <p className="text-white/50 text-sm">
+          주식 게시글에서 추출된 키워드의 언급량과 트렌드를 분석합니다.
         </p>
       </header>
 
       <section className="grid-auto-fit">
         <MetricCard
-          title="최근 1주 언급량"
-          value={`${weeklyMetrics.totalMentions.toLocaleString()}건`}
+          title="총 언급량"
+          value={`${keywordMetrics.totalMentions.toLocaleString()}회`}
         />
-        <MetricCard title="최대 언급 키워드" value={weeklyMetrics.topKeyword} />
+        <MetricCard title="1위 키워드" value={keywordMetrics.topKeyword} />
         <MetricCard
-          title="최대 언급 건수"
-          value={weeklyMetrics.topMentions}
-          delta={`긍정 ${weeklyMetrics.topPositive}`}
+          title="1위 언급 횟수"
+          value={keywordMetrics.topMentions}
+        />
+        <MetricCard
+          title="분석 키워드 수"
+          value={`${keywordMetrics.uniqueKeywords}개`}
         />
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <WeeklyMentionsChart data={weeklyQuery.data} loading={weeklyQuery.isLoading} />
-        <WeeklyMentionsList data={weeklyQuery.data} loading={weeklyQuery.isLoading} />
+        <KeywordRankingChart data={keywordQuery.data} loading={keywordQuery.isLoading} />
+        <KeywordPieChart data={keywordQuery.data} loading={keywordQuery.isLoading} />
+      </section>
+
+      <section>
+        <KeywordWordCloud data={keywordQuery.data} loading={keywordQuery.isLoading} />
       </section>
     </main>
   );

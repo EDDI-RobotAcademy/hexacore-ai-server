@@ -55,3 +55,7 @@ export async function fetchWeeklyStockStats(): Promise<WeeklyStockStat[]> {
   return request("/api/stocks/weekly");
 }
 
+export async function fetchTopKeywords(limit: number = 20): Promise<import("@/types/stock").KeywordMention[]> {
+  return request(`/keywords/top?limit=${limit}`);
+}
+
