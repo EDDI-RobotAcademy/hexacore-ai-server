@@ -8,14 +8,6 @@ class Settings(BaseSettings):
     # MySQL URL (필수)
     MYSQL_URL: str
 
-    # Redis URL (필수)
-    REDIS_URL: str
-
-    # Google OAuth (필수)
-    GOOGLE_CLIENT_ID: str
-    GOOGLE_CLIENT_SECRET: str
-    GOOGLE_REDIRECT_URI: str
-
     # OpenAI Settings (필수)
     OPENAI_API_KEY: str
 

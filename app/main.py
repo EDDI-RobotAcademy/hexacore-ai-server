@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 
 from app.router import setup_routers
 from config.database.session import engine, Base
-from config.redis_config import get_redis
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -16,14 +15,6 @@ async def lifespan(app: FastAPI):
     # 데이터베이스 테이블 생성
     Base.metadata.create_all(bind=engine)
     print("✅ Database tables created")
-
-    # Redis 연결 테스트
-    try:
-        redis_client = get_redis()
-        redis_client.ping()
-        print("✅ Redis connection established")
-    except Exception as e:
-        print(f"⚠️  Redis connection failed: {e}")
 
     yield
 
